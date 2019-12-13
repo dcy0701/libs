@@ -1,0 +1,23 @@
+{
+  "name": "libs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcy0701/libs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dcy0701/libs/issues"
+  },
+  "homepage": "https://github.com/dcy0701/libs#readme",
+  "dependencies": {
+    "jest": "^24.9.0"
+  }
+}
