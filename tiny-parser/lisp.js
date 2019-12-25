@@ -145,7 +145,7 @@ const traverser = (ast, visitor) => {
 };
 
 const transformer = ast => {
-  ast._context = []
+  ast._context = [];
 
   traverser(ast, {
     CallExpression: (node, parent) => {
@@ -204,11 +204,11 @@ const codegen = node => {
   }
 };
 
-const compiler = (code) => {
-  const tokens = tokenizer(code)
-  const ast = parser(tokens)
-  const newAst = transformer(ast)
-  return codegen(newAst)
-}
+const compiler = code => {
+  const tokens = tokenizer(code);
+  const ast = parser(tokens);
+  const newAst = transformer(ast);
+  return codegen(newAst);
+};
 
-console.log(compiler('(add 1 (substract 2 3))'));
+console.log(compiler("(add 1 (substract 2 3))"));
