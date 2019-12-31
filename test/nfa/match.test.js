@@ -1,5 +1,4 @@
 const { match } = require("../../nfa/index");
-
 describe("match", () => {
   test("should concat works as expect", () => {
     expect(match("a", "a")).toBe(true);

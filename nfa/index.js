@@ -7,8 +7,37 @@ const match = (reg, str) => {
   reg = regToPostifx(reg);
   // 创建NFA
   nfa = buildToNfa(reg);
-  // 匹配
+
+  // 回溯
+  return isMatchBackTrack(nfa, str);
+
+  // 全量匹配
   return isMatch(nfa, str);
+};
+
+const isMatchBackTrack = (nfa, str) => {
+  const strQueue = str.split("");
+  const bt = (state, strQueue) => {
+    if (state.isEnd === true && strQueue.length === 0) {
+      return true;
+    }
+    const ch = strQueue.shift();
+    if (ch !== undefined && state.transitions[ch] && bt(state.transitions[ch], strQueue)) {
+      return true;
+    }
+
+    ch !== undefined && strQueue.unshift(ch);
+
+    for (const nextState of state.epsilonTransitions || []) {
+      if (bt(nextState, strQueue)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  return bt(nfa.startState, strQueue);
 };
 
 const isMatch = (nfa, str) => {
@@ -17,8 +46,10 @@ const isMatch = (nfa, str) => {
   for (const ch of str) {
     const nextStates = [];
     for (const state of currentStates) {
+      matchTimes++;
       if (state.transitions[ch]) {
-        nextStates.push(...NFA.getClosure(state.transitions[ch]));
+        const paths = NFA.getClosure(state.transitions[ch]);
+        nextStates.push(...paths.filter(item => !nextStates.includes(item)));
       }
     }
     currentStates = nextStates;
@@ -67,7 +98,9 @@ const NFA = class {
       const currentState = queue.pop();
 
       if (!isPlainObject(currentState.transitions) || currentState.isEnd) {
-        accessStates.push(currentState);
+        if (!accessStates.includes(currentState)) {
+          accessStates.push(currentState);
+        }
       }
 
       const currentEpsilonTransitions = currentState.epsilonTransitions.filter(
