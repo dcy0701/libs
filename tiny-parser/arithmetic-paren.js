@@ -187,10 +187,6 @@ const parser = tokens => {
   return parseStatement();
 };
 
-
-
-
-
 const tokens = tokenizer("(1 + 2) * 10 - 5 / 3");
 const ast = parser(tokens)
 console.log(ast);
