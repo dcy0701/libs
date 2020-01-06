@@ -7,6 +7,14 @@ const match = (reg, str) => {
   reg = regToPostifx(reg);
   // 创建NFA
   nfa = buildToNfa(reg);
+  // 转成DFA
+  // TODO
+
+  // DFA 最小化
+  // TODO
+
+  // MATCH DFA
+  // TODO
 
   // 回溯
   return isMatchBackTrack(nfa, str);
