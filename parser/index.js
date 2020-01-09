@@ -1,5 +1,5 @@
-const identifierReg = /[A-Za-z_$]/; //匹配开头
-const identifierGlobalReg = /[A-Za-z_$0-9]+/g; // 匹配变量名
+const identifierReg = /[A-Za-z_$]/
+const identifierGlobalReg = /[A-Za-z_$0-9]+/g
 const keywords = /^(?:var|const|let|class|constructor|extends|static|super|function|return|throw|if|else|switch|case|default|for|in|while|do|break|continue|try|catch|finally|debugger|new|this|null|true|false|delete|void|typeof|instanceof|export|as|from|import|of)$/;
 
 let tokenPos = 0; // token当前位置

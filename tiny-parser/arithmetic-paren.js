@@ -1,3 +1,49 @@
+/*
+  我们设计一个支持 + - * / 的DSL语言
+  比如 "(1 + 2) * 10 - 5 / 3;"
+
+  先看优先级 乘法和除法的优先级最高 所以我们首先判断 + -
+  BNF:
+  Expr ::= Expr + Term
+        | Expr - Term
+        | Term
+  Term ::= Term * Factor
+        | Term / Factor
+        | Factor
+  Factor:: = (expr)
+        | num
+
+  Factor 就是类似JS中的primary Expression，由终结符和括号组成，为优先级最高的因子
+
+  这是一个递归下降的分析
+
+  为什么要消除左递归？
+  Expr ::= Expr + Term => Expr + Term + Term => Expr + Term + Term + Term
+  会一直递归下去。
+
+  // 消除左递归
+  首先确认：Factor不变
+  
+  Factor:: = (expr)
+        | num
+  
+  构建Term
+  引入一个中间符号Term1
+
+  Term1 ::= * Factor Term1
+          | / Factor Term1
+          | empty
+  Term  ::= Factor Term1
+
+  构建 Expr 同样的思路
+  Expr1 ::= + Term Expr1
+          | - Term Expr1
+          | empty
+  Expr ::= Term Expr1
+
+  这样转化成了右递归
+*/
+
 const tokenizer = sourceCode => {
   let ch = "";
   let nextAt = 0;
@@ -61,6 +107,38 @@ const parser = tokens => {
     return node;
   };
 
+  // Expr ::= Term Expr1
+  // Expr1 ::= + Term Expr1
+  //         | - Term Expr1
+  //         | empty
+
+  const parseExpression = () => {
+    const leftResult = parseTerm();
+    const rightResult = parseExpr1();
+
+    if (rightResult === null) {
+      return leftResult;
+    }
+
+    const node = {
+      type: "binaryExpression",
+    };
+
+    const [operator, nodeRight] = rightResult;
+
+    node.left = leftResult;
+    node.right = nodeRight;
+    node.operator = operator;
+
+    return node
+  };
+
+
+  // Expr ::= Term Expr1
+  // Expr1 ::= + Term Expr1
+  //         | - Term Expr1
+  //         | empty
+
   const parseExpr1 = () => {
     const lastTok = tok;
     if (lastTok === "+" || lastTok === "-") {
@@ -87,27 +165,13 @@ const parser = tokens => {
 
     return null;
   };
+  
 
-  const parseExpression = () => {
-    const leftResult = parseTerm();
-    const rightResult = parseExpr1();
+  //   Term  ::= Factor Term1
+  //   Term1 ::=  * Factor Term1
+  //            | / Factor Term1
+  //            | empty
 
-    if (rightResult === null) {
-      return leftResult;
-    }
-
-    const node = {
-      type: "binaryExpression",
-    };
-
-    const [operator, nodeRight] = rightResult;
-
-    node.left = leftResult;
-    node.right = nodeRight;
-    node.operator = operator;
-
-    return node
-  };
   const parseTerm = () => {
     const leftResult = parseFactor();
     const rightResult = parseTerm1();
@@ -128,6 +192,11 @@ const parser = tokens => {
 
     return node
   };
+
+    //   Term  ::= Factor Term1
+    //   Term1 ::=  * Factor Term1
+    //            | / Factor Term1
+    //            | empty
 
   const parseTerm1 = () => {
     const lastTok = tok;
@@ -158,6 +227,7 @@ const parser = tokens => {
 
   // Factor:: = (expr)
   //          | num
+
   const parseFactor = () => {
     if (isNumber(tok)) {
       const node = {
@@ -184,9 +254,11 @@ const parser = tokens => {
   };
 
   eat();
+
   return parseStatement();
 };
 
 const tokens = tokenizer("(1 + 2) * 10 - 5 / 3");
 const ast = parser(tokens)
+
 console.log(ast);
